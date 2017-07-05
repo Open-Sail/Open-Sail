@@ -1,134 +1,86 @@
 (function(){
-  // let input_field = '<div class="input-field col s6"><input id="email_addr" type="text" class="validate"><label for="email_addr">E-mail Address</label></div>'
 
-  // setTimeout(function(){
-  //   Materialize.toast('<h5 style="color:white;">Newsletter Sign-up!</h5> '+input_field, 32000)
-  // }, 10000)
-
-  let drop_the_menu = function(hover_elem, drop_elem) {
-
-  }
-
-  // if mouseenter nav-bar, set dropdown to hidden
-  let nav = document.getElementById('nav')
-  nav.addEventListener('mouseenter', () => {
-    // document.getElementById('ddd').style.visibility = 'hidden'
-  })
-
-  document.getElementById('ddd').addEventListener('mouseleave', () => {
-    // this.style.visibility = 'hidden'
-    document.getElementById('ddd').style.visibility = 'hidden'
-    // console.log(this)
-  })
-
-
-
-  // select the nav-items individually, then on mouseover, set the properties of the corresponding dropdown div
-  // console.log('nav item 01 :', document.getElementById("nav-item-01"))
-  console.log(
-    document.getElementById("nav-item-01"),
-    document.getElementById("nav-item-02"),
-    document.getElementById("nav-item-03")
-  )
-  let service_nav = document.getElementById('nav-item-01')
-  let about_nav = document.getElementById('nav-item-02')
-  let collab_nav = document.getElementById('nav-item-03')
-
-  let service_nav_drop = document.getElementById('navdrop01')
-  let about_nav_drop = document.getElementById('navdrop02')
-  let collab_nav_drop = document.getElementById('navdrop03')
-
-  let nav_lst = {
-    service: [
-      service_nav,
-      service_nav_drop
-    ],
-    about:[
-      about_nav,
-      about_nav_drop,
-    ],
-    collab:[
-      collab_nav,
-      collab_nav_drop
+  /*
+   * let this be a function to return an array of nav-elements that have a corresponding drop down menu
+   * define a nested-local function to alias document.getElementById() -> gi()
+   */
+  let build_nav_lst = () => {
+    let gi = (elem) => {
+      return document.getElementById(elem)
+    }
+    return [
+      [
+        gi('nav-item-01'), gi('navdrop01')
+      ],
+      [
+        gi('nav-item-02'), gi('navdrop02')
+      ],
+      [
+        gi('nav-item-03'), gi('navdrop03')
+      ]
     ]
   }
 
-
+  /*
+   * aha, so this function does a number of things...
+   * first, it's important to know that it takes three parameters...
+   * the n => nav-item,
+   * the d => drop-down-item (the one that's associated with the nav item)
+   *
+   * @ thas, represents the 'this' keyword as this function is called inside of a loop
+   * 'this' is intended to refer to the item n the nav bar
+   */
   let drop_the_down = function(thas, n, d){
+
+    // the the rectangle and positional data associated with 'this'
+    // keep in mind that 'this' is meant to be an instance of a nav-item
     let rect = thas.getBoundingClientRect()
     d.style.visibility = 'visible'
     d.style.backgroundColor = '#ffffff'
     d.width = n.getBoundingClientRect().width+'px'
-    d.style.left = (n.getBoundingClientRect().left - n.getBoundingClientRect().width)+'px'
+    d.style.left = (n.getBoundingClientRect().left - (n.getBoundingClientRect().width))+'px'
     d.style.top = n.getBoundingClientRect().bottom+'px'
 
     // if the mouse move out of the drop down, set it to hidden
     d.addEventListener('mouseleave', function(){
       d.style.visibility = 'hidden'
     })
-    // n.addEventListener('click', function(){
-    //   if (d.style.visibility == 'hidden') {
-    //     d.style.visibility = 'visible'
-    //   } else {
-    //     d.style.visibility = 'hidden'
-    //   }
-    // })
   }
-  nav_lst.service[0].addEventListener('click', function(){
-    if (nav_lst.service[1].style.visibility == 'hidden') {
 
-      drop_the_down(this, nav_lst.service[0], nav_lst.service[1])
-    } else {
-      nav_lst.service[1].style.visibility = 'hidden'
+
+  /*
+   * this is a function that takes a 2d array of DOM elements, containing nav-bar-items and corresponding drop-down-menus, the function adds event listeners to the nav bar
+   * each row of the 2D array, nav_lst, has two indices
+   * at the 0th index, there's a nav-bar-item
+   * at the 1st index, there's a corresponding drop-down element
+   * example
+   * nav_lst = [
+   *  [nav-bar-item-01, drop-down-menu-01],
+   *  [nav-bar-item-02, drop-down-menu-02],
+   *  [nav-bar-item-03, drop-down-menu-03],
+   *  ...
+   * ]
+   * where the type is a DOM element...
+   * nav_lst = [
+   *  [document.getElementById('nav-bar-item-01'), document.getElementById('drop-down-menu-01')],
+   *  [document.getElementById('nav-bar-item-02'), document.getElementById('drop-down-menu-02')],
+   *  ...
+   * ]
+   * ... and each of the drop-down-menu items are assumed to have an initial style.visibility of 'hidden'
+   * @ nav_lst, a list of navigation items to add corresponding event listeners to
+   * @ eventtt, an eventListener event string -> ex. 'mouseover', 'click'
+   *
+   */
+  let add_event_listeners_to_nav_items = (nav_lst, eventtt) => {
+    for (let i = 0; i < nav_lst.length; i++){
+      nav_lst[i][0].addEventListener(eventtt, function(e) {
+        if (nav_lst[i][1].style.visibility == 'hidden') drop_the_down(this, nav_lst[i][0], nav_lst[i][1])
+        else nav_lst[i][1].style.visibility = 'hidden'
+      });
     }
-  })
-  nav_lst.about[0].addEventListener('click', function(){
-    if ( nav_lst.about[1].style.visibility == 'hidden') {
-      drop_the_down(this, nav_lst.about[0], nav_lst.about[1])
-    } else {
-      nav_lst.about[1].style.visibility = 'hidden'
-    }
-  })
-  nav_lst.collab[0].addEventListener('click', function(){
-    if (nav_lst.collab[1].style.visibility == 'hidden') {
-      drop_the_down(this, nav_lst.collab[0], nav_lst.collab[1])
-    } else {
-      nav_lst.collab[1].style.visibility = 'hidden'
-    }
-  })
+  }
 
-  // x(this, nav_lst.service[0], nav_lst.service[1])
+  let nav_lst = build_nav_lst()
+  add_event_listeners_to_nav_items(nav_lst, 'click')
 
-
-  // for (x in nav_lst){
-  //   nav_lst[x][1].addEventListener('mouseleave', function(){
-  //     nav_lst.service[1].style.visibility = 'hidden'
-  //   })
-  // }
-  // nav_lst.service[1].addEventListener('mouseout', function(){
-  //   nav_lst.service[1].style.visibility = 'hidden'
-  // })
-  // nav_lst.push(service_nav, about_nav, collab_nav)
-  console.log('nav lst :', nav_lst)
-
-  // nav_lst.service.addEventListener('mouseover', function(){
-  //   console.log('mouseover item 01')
-  // })
-
-  // get all nav items
-  let nav_items = document.getElementsByClassName('nav-item')
-
-  // loop through the nav items
-  // for (let i = 0; i < nav_items.length;i++){
-  //   console.log(nav_items[i].getBoundingClientRect())
-  //
-  //   nav_items[i].addEventListener("mouseover", function(){
-  //     let rect = this.getBoundingClientRect()
-  //     document.getElementById('ddd').style.visibility = 'visible'
-  //     document.getElementById('ddd').style.backgroundColor = '#ffffff'
-  //     document.getElementById('ddd').width = nav_items[i].getBoundingClientRect().width+'px'
-  //     document.getElementById('ddd').style.left = (nav_items[i].getBoundingClientRect().left - nav_items[i].getBoundingClientRect().width)+'px'
-  //     document.getElementById('ddd').style.top = nav_items[i].getBoundingClientRect().bottom+'px'
-  //   })
-  // }
 })()
